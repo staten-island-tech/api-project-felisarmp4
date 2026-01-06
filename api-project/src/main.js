@@ -13,3 +13,16 @@ async function getsong(url) {
   }
 }
 getsong(url);
+
+export async function loadsong(url){
+  try{
+    const response = await fetch(url);
+    const data = await response.json();
+    const dataarr = data['data'];
+    dataarr.forEach(obj => {
+      if(!obj.hasOwnProperty('images')){
+        return;
+      }
+    })
+  }
+}
