@@ -28,10 +28,7 @@ async function loadsong(url) {
       <div class="w-200 mx-auto rounded-2xl m-3 text-3xl text-indigo-900 text-center">
       <h2>${name}</h2>
       <p>${episode}</p>
-      <p>Key: ${keysignature}</p>
       <p>Length: ${length}</p>
-      <p>Lyrics: ${lyricsby}</p>
-      <p>Music: ${musicby}</p>
       <a href="${video}" target="_blank">Watch video</a>
       </div>
 
