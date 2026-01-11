@@ -1,52 +1,65 @@
 import "./style.css";
 
-const url = "http://ponyapi.net/v1/song/all?limit=192";
+const url = "https://ponyapi.net/v1/song/all?limit=192";
 const songcarddiv = document.querySelector("#songcarddiv");
 
-async function loadsong(url) {
+async function loadsongs() {
+  if (!songcarddiv) return;
+
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-    const songs = data.data;
+    const res = await fetch(url);
+    const data = await res.json();
+    const songs = data.data.filter((song) => song.video);
 
     songcarddiv.innerHTML = "";
 
-    songs.forEach((song) => {
-      const name = song.name;
-      const episode = song.episode;
-      const keysignature = song.keysignature;
-      const length = song.length;
-      const lyricsby = song.lyricsby;
-      const musicby = song.musicby;
-      const video = song.video;
-
-      if (!song.video) return;
-      const embedURL = song.video.replace("watch?v=", "embed/");
+    songs.forEach((song, index) => {
       songcarddiv.insertAdjacentHTML(
         "beforeend",
         `
-      <div class="w-200 mx-auto rounded-2xl m-3 text-3xl text-indigo-900 text-center">
-      <h2>${name}</h2>
-      <p>${episode}</p>
-      <p>Length: ${length}</p>
-      <a href="${video}" target="_blank">Watch video</a>
-      </div>
-
-         <iframe 
-            width="560" 
-            height="315" 
-            src="${embedURL}" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
+        <div class="w-200 mx-auto rounded-2xl m-3 text-3xl text-indigo-900 text-center">
+          <h2>${song.name}</h2>
+          <button data-index="${index}">
+            more info :3
+          </button>
+          <div id="details-${index}"></div>
         </div>
         `
       );
     });
-  } catch (error) {
-    console.error("failed to load songs:", error);
+
+    songcarddiv.addEventListener("click", (e) => {
+      if (e.target.tagName !== "BUTTON") return;
+
+      const index = e.target.dataset.index;
+      const song = songs[index];
+      const details = document.querySelector(`#details-${index}`);
+
+      if (details.innerHTML) {
+        details.innerHTML = "";
+        return;
+      }
+
+      const embedurl = song.video.replace("watch?v=", "embed/");
+
+      details.innerHTML = `
+        <p>${song.episode}</p>
+        <p>length: ${song.length}</p>
+        <p>lyrics by: ${song.lyricsby ?? "unknown"}</p>
+        <p>music by: ${song.musicby ?? "unknown"}</p>
+
+        <iframe
+          width="560"
+          height="315"
+          src="${embedurl}"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      `;
+    });
+  } catch (err) {
+    console.error("failed to load songs:", err);
   }
 }
 
-loadsong(url);
+loadsongs();
