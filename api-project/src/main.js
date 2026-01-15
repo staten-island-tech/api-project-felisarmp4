@@ -42,7 +42,7 @@ async function loadsongs() {
     const data = await res.json();
 
     allsongs = data.data.filter((song) => song.video);
-
+    console.log(allsongs);
     rendersongs(allsongs);
   } catch (err) {
     console.error("failed to load songs:", err);
