@@ -45,7 +45,9 @@ async function loadsongs() {
     console.log(allsongs);
     rendersongs(allsongs);
   } catch (err) {
-    console.error("failed to load songs:", err);
+    songcarddiv.innerHTML =
+      "<p class='text-indigo-900 text-xl'>failed to load songs, please try again later!</p>";
+    console.error(err);
   }
 }
 
