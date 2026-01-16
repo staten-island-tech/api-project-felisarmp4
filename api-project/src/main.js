@@ -55,7 +55,7 @@ songcarddiv.addEventListener("click", (e) => {
   if (!e.target.matches("button[data-video]")) return;
 
   const videourl = e.target.dataset.video;
-  const song = allsongs.find((s) => s.video === videourl);
+  const song = allsongs.find((s) => s.video === videourl); // hi señor whalen
 
   const card = e.target.closest("div");
   const details = card.querySelector(".details");
@@ -95,7 +95,7 @@ searchinput.addEventListener("input", () => {
   const filtered = allsongs.filter(
     (song) =>
       song.name.toLowerCase().includes(query) ||
-      song.episode.toLowerCase().includes(query)
+      song.episode.toLowerCase().includes(query),
   );
 
   rendersongs(filtered);
