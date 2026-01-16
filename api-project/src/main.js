@@ -1,12 +1,11 @@
 import "./style.css";
 
-const url = "https://ponyapi.net/v1/song/all?limit=192";
 const songcarddiv = document.querySelector("#songcarddiv");
 const searchinput = document.querySelector("#search");
 
 let allsongs = [];
 
-function rendersongs(songs) {
+function renderSongs(songs) {
   if (!songcarddiv) return;
 
   songcarddiv.innerHTML = "";
@@ -21,11 +20,11 @@ function rendersongs(songs) {
       <p class="text-lg">${song.episode}</p>
 
       <button
-      class="bg-violet-400 rounded-xl px-4 py-2 mt-3 transition-transform duration-300 hover:scale-110"
-      data-video="${song.video}"
-    >
-      more info :3
-    </button>
+        class="bg-violet-400 rounded-xl px-4 py-2 mt-3 transition-transform duration-300 hover:scale-110"
+        data-video="${song.video}"
+      >
+        more info :3
+      </button>
 
       <div class="details mt-3"></div>
     `;
@@ -34,19 +33,30 @@ function rendersongs(songs) {
   });
 }
 
-async function loadsongs() {
-  if (!songcarddiv) return;
-
+async function fetchAllSongs() {
   try {
-    const res = await fetch(url);
+    const res = await fetch("https://ponyapi.net/v1/song/all?limit=192");
     const data = await res.json();
 
     allsongs = data.data.filter((song) => song.video);
-    console.log(allsongs);
-    rendersongs(allsongs);
+    renderSongs(allsongs);
   } catch (err) {
     songcarddiv.innerHTML =
-      "<p class='text-indigo-900 text-xl'>failed to load songs, please try again later!</p>";
+      "<p class='text-indigo-900 text-xl'>failed to load songs 😿</p>";
+    console.error(err);
+  }
+}
+
+async function fetchSongsBySearch(query) {
+  try {
+    const res = await fetch(
+      `https://ponyapi.net/v1/song/all?limit=192&search=${encodeURIComponent(query)}`,
+    );
+    const data = await res.json();
+
+    const results = data.data.filter((song) => song.video);
+    renderSongs(results);
+  } catch (err) {
     console.error(err);
   }
 }
@@ -54,8 +64,8 @@ async function loadsongs() {
 songcarddiv.addEventListener("click", (e) => {
   if (!e.target.matches("button[data-video]")) return;
 
-  const videourl = e.target.dataset.video;
-  const song = allsongs.find((s) => s.video === videourl); // hi señor whalen
+  const videoURL = e.target.dataset.video;
+  const song = allsongs.find((s) => s.video === videoURL);
 
   const card = e.target.closest("div");
   const details = card.querySelector(".details");
@@ -65,7 +75,7 @@ songcarddiv.addEventListener("click", (e) => {
     return;
   }
 
-  const embedurl = song.video.replace("watch?v=", "embed/");
+  const embedURL = song.video.replace("watch?v=", "embed/");
 
   details.innerHTML = `
     <p>length: ${song.length}</p>
@@ -77,7 +87,7 @@ songcarddiv.addEventListener("click", (e) => {
       class="mx-auto mt-3"
       width="560"
       height="315"
-      src="${embedurl}"
+      src="${embedURL}"
       loading="lazy"
       allowfullscreen>
     </iframe>
@@ -85,37 +95,14 @@ songcarddiv.addEventListener("click", (e) => {
 });
 
 searchinput.addEventListener("input", () => {
-  const query = searchinput.value.trim().toLowerCase();
+  const query = searchinput.value.trim();
 
   if (!query) {
-    rendersongs(allsongs);
+    renderSongs(allsongs);
     return;
   }
 
-  const filtered = allsongs.filter(
-    (song) =>
-      song.name.toLowerCase().includes(query) ||
-      song.episode.toLowerCase().includes(query),
-  );
-
-  rendersongs(filtered);
+  fetchSongsBySearch(query);
 });
 
-loadsongs();
-
-const backtotop = document.querySelector("#backtotop");
-
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 300) {
-    backtotop.classList.remove("hidden");
-  } else {
-    backtotop.classList.add("hidden");
-  }
-});
-
-backtotop.addEventListener("click", () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-});
+fetchAllSongs();
